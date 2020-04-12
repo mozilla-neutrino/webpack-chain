@@ -37,6 +37,7 @@ module.exports = class extends ChainedMap {
       'recordsInputPath',
       'recordsPath',
       'recordsOutputPath',
+      'singleEntry',
       'stats',
       'target',
       'watch',
@@ -117,6 +118,14 @@ module.exports = class extends ChainedMap {
   toConfig() {
     const entryPoints = this.entryPoints.entries() || {};
 
+    const entry = this.has('singleEntry')
+      ? this.get('singleEntry')
+      : Object.keys(entryPoints).reduce(
+          (acc, key) =>
+            Object.assign(acc, { [key]: entryPoints[key].values() }),
+          {},
+        );
+
     return this.clean(
       Object.assign(this.entries() || {}, {
         node: this.node.entries(),
@@ -128,11 +137,8 @@ module.exports = class extends ChainedMap {
         optimization: this.optimization.toConfig(),
         plugins: this.plugins.values().map(plugin => plugin.toConfig()),
         performance: this.performance.entries(),
-        entry: Object.keys(entryPoints).reduce(
-          (acc, key) =>
-            Object.assign(acc, { [key]: entryPoints[key].values() }),
-          {},
-        ),
+        entry,
+        singleEntry: undefined,
       }),
     );
   }

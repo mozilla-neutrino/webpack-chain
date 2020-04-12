@@ -61,6 +61,16 @@ test('entry', t => {
   ]);
 });
 
+test('single string entry', t => {
+  const config = new Config();
+
+  config.set('singleEntry', 'src/index.js');
+
+  t.deepEqual(config.toConfig(), {
+    entry: 'src/index.js',
+  });
+});
+
 test('plugin empty', t => {
   const config = new Config();
   const instance = config
