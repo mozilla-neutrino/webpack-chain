@@ -217,6 +217,9 @@ config
     .clear()
     .end()
 
+  .set('node', false)
+  .delete('node')
+
   .devServer
     .allowedHosts
       .add('host.com')

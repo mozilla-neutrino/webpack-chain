@@ -842,6 +842,13 @@ config.resolve
 
 #### Config node
 
+You can set `node` option to object, or a `false` value.
+`false` value always rewrite `config.node` object.
+
+```js
+config.set('node', false);
+```
+
 ```js
 config.node : ChainedMap
 

@@ -116,10 +116,12 @@ module.exports = class extends ChainedMap {
 
   toConfig() {
     const entryPoints = this.entryPoints.entries() || {};
+    const nodeValue = this.get('node');
+    const hasNodeValue = typeof nodeValue !== 'undefined';
 
     return this.clean(
       Object.assign(this.entries() || {}, {
-        node: this.node.entries(),
+        node: hasNodeValue ? nodeValue : this.node.entries(),
         output: this.output.entries(),
         resolve: this.resolve.toConfig(),
         resolveLoader: this.resolveLoader.toConfig(),
@@ -143,7 +145,6 @@ module.exports = class extends ChainedMap {
 
   merge(obj = {}, omit = []) {
     const omissions = [
-      'node',
       'output',
       'resolve',
       'resolveLoader',
@@ -165,12 +166,21 @@ module.exports = class extends ChainedMap {
       );
     }
 
+    if (!omit.includes('node') && 'node' in obj) {
+      if (typeof obj.node === 'object') {
+        this.delete('node');
+        this.node.merge(obj.node);
+      } else {
+        this.set('node', obj.node);
+      }
+    }
+
     omissions.forEach((key) => {
       if (!omit.includes(key) && key in obj) {
         this[key].merge(obj[key]);
       }
     });
 
-    return super.merge(obj, [...omit, ...omissions, 'entry', 'plugin']);
+    return super.merge(obj, [...omit, ...omissions, 'entry', 'plugin', 'node']);
   }
 };

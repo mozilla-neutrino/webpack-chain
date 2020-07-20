@@ -48,6 +48,18 @@ test('node', () => {
   });
 });
 
+test('node with false value', () => {
+  const config = new Config();
+  const instance = config
+    .set('node', false)
+    .node.set('__dirname', 'mock')
+    .set('__filename', 'mock')
+    .end();
+
+  expect(instance).toBe(config);
+  expect(config.get('node')).toBe(false);
+});
+
 test('entry', () => {
   const config = new Config();
 
@@ -168,6 +180,16 @@ test('toConfig with values', () => {
         },
       ],
     },
+  });
+});
+
+test('toConfig with node false value', () => {
+  const config = new Config();
+
+  config.set('node', false).node.set('__dirname', 'mock').end();
+
+  expect(config.toConfig()).toStrictEqual({
+    node: false,
   });
 });
 
@@ -320,6 +342,46 @@ test('merge with omit', () => {
       index: ['babel-polyfill', 'src/index.js'],
     },
     plugins: [new StringifyPlugin(), new EnvironmentPlugin()],
+  });
+});
+
+test('merge with node false value', () => {
+  const config = new Config();
+
+  config.node.set('__dirname', 'mock');
+
+  const obj = {
+    node: false,
+  };
+
+  const instance = config.merge(obj);
+
+  expect(instance).toBe(config);
+
+  expect(config.toConfig()).toStrictEqual({
+    node: false,
+  });
+});
+
+test('merge with node object value', () => {
+  const config = new Config();
+
+  config.set('node', false);
+
+  const obj = {
+    node: {
+      __dirname: 'mock',
+    },
+  };
+
+  const instance = config.merge(obj);
+
+  expect(instance).toBe(config);
+
+  expect(config.toConfig()).toStrictEqual({
+    node: {
+      __dirname: 'mock',
+    },
   });
 });
 
