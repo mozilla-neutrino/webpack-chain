@@ -38,7 +38,7 @@
   "devDependencies": {
     "@types/enhanced-resolve": "^3.0.6",
     "@types/tapable": "^1.0.6",
-    "@types/webpack": "^4.41.21",
+    "@types/webpack": "^5.0.0",
     "auto-changelog": "^2.2.0",
     "eslint": "^7.5.0",
     "eslint-config-airbnb-base": "^14.2.0",
@@ -48,6 +48,6 @@
     "jest": "^27.0.0",
     "prettier": "^2.0.5",
     "typescript": "^4.0.0",
-    "webpack": "^4.43.0"
+    "webpack": "^5.0.0"
   }
 }
