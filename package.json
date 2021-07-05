@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@types/enhanced-resolve": "^3.0.6",
-    "@types/tapable": "^1.0.6",
+    "@types/tapable": "^2.0.0",
     "@types/webpack": "^4.41.21",
     "auto-changelog": "^2.2.0",
     "eslint": "^7.5.0",
