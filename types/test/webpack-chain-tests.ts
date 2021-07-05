@@ -2,11 +2,16 @@
  * Notes: The order structure of the type check follows the order
  * of this document: https://github.com/neutrinojs/webpack-chain#config
  */
-import Resolver = require('enhanced-resolve/lib/Resolver');
+import { Resolver } from 'enhanced-resolve';
 import Config = require('webpack-chain');
 import * as webpack from 'webpack';
 
-class ResolvePluginImpl extends webpack.ResolvePlugin {
+type ResolvePlugin = Exclude<
+  Exclude<webpack.ResolveOptions['plugins'], undefined>[number],
+  '...'
+>;
+
+class ResolvePluginImpl implements ResolvePlugin {
   apply(resolver: Resolver): void {}
 }
 
@@ -15,44 +20,17 @@ function expectType<T>(value: T) {}
 const config = new Config();
 
 config
-  .amd({ foo: true })
-  .bail(true)
-  .cache(false)
-  .cache({})
-  .devtool('hidden-source-map')
-  .devtool(false)
-  .context('')
-  .externals('foo')
-  .externals(/node_modules/)
-  .externals({ test: false, foo: 'bar' })
-  .externals(['foo', 'bar'])
-  .externals((context, request, cb) => cb(null, 'foo'))
-  .loader({})
-  .name('config-name')
-  .mode('none')
-  .mode('development')
-  .mode('production')
-  .profile(false)
-  .parallelism(2)
-  .recordsPath('')
-  .recordsInputPath('')
-  .recordsOutputPath('')
-  .stats({
-    assets: false,
-    publicPath: true,
-    modules: false,
-  })
-  .target('web')
-  .watch(true)
-  .watchOptions({})
-  .when(
-    false,
-    (config) => config.watch(true),
-    (config) => config.watch(false),
-  )
-
+  // entry
   .entry('main')
   .add('index.js')
+  .add(['index.js', 'xxx.js'])
+  .add({
+    import: './personal.js',
+    filename: 'pages/personal.js',
+    dependOn: 'shared',
+    chunkLoading: 'jsonp',
+    layer: 'name of layer',
+  })
   .delete('index.js')
   .clear()
   .when(
@@ -60,22 +38,26 @@ config
     (entry) => entry.clear(),
     (entry) => entry.clear(),
   )
+  .batch((x) => {})
   .end()
-
+  // entryPoints
   .entryPoints.delete('main')
   .end()
-
-  .output.futureEmitAssets(true)
-  .auxiliaryComment('Test Comment')
+  // output
+  .output.auxiliaryComment('Test Comment')
   .auxiliaryComment({
     root: 'Root Comment',
+    commonjs: 'CommonJS Comment',
+    commonjs2: 'CommonJS2 Comment',
+    amd: 'AMD Comment',
   })
+  .charset(true)
   .chunkFilename('')
   .chunkLoadTimeout(1000)
-  .crossOriginLoading(true)
+  .chunkLoadingGlobal('xasd')
+  .crossOriginLoading('anonymous')
   .devtoolFallbackModuleFilenameTemplate('')
   .devtoolNamespace('')
-  .devtoolLineToLine('')
   .devtoolModuleFilenameTemplate('')
   .filename('main.js')
   .globalObject('global')
@@ -84,9 +66,7 @@ config
   .hashDigestLength(15)
   .hashSalt('')
   .hotUpdateChunkFilename('update')
-  .hotUpdateFunction(() => {})
   .hotUpdateMainFilename('main')
-  .jsonpFunction('callback')
   .library('var')
   .libraryExport(['MyModule', 'MySubModule'])
   .libraryTarget('var')
@@ -96,23 +76,101 @@ config
   .sourceMapFilename('index.js.map')
   .sourcePrefix('~')
   .strictModuleExceptionHandling(true)
+  .iife(true)
   .umdNamedDefine(true)
+  .clean({
+    dry: true,
+  })
   .end()
-
-  .resolve.cachePredicate(({ path, request }) => true)
-  .cacheWithContext(true)
-  .enforceExtension(true)
-  .enforceModuleExtension(true)
-  .unsafeCache(false)
-  .unsafeCache(/foo/)
-  .symlinks(true)
-  .alias.set('foo', 'bar')
+  // module
+  .module.noParse(/.min.js$/)
+  .strictExportPresence(true)
+  .wrappedContextRegExp(/sdasd/)
+  .generator.set('asset', {
+    publicPath: 'assets/',
+  })
+  .end()
+  // module rule
+  .rule('compile')
+  .test(/.js$/)
+  .include.add(/.js$/)
+  .end()
+  .exclude.add(/node_modules/)
+  .end()
+  .parser({
+    opt: 'foo',
+  })
+  .enforce('pre')
+  .issuerLayer('asd')
+  .sideEffects(true)
+  .mimetype('application/json')
+  .generator({
+    asset: {
+      publicPath: 'assets/',
+    },
+  })
+  .use('babel')
+  .tap((config) => [])
+  .loader('babel-loader')
+  .options({})
+  .end()
+  .use('eslint')
+  .loader('eslint-loader')
+  .options({})
+  .after('babel')
+  .end()
+  .uses.delete('babel')
+  .delete('eslint')
+  .end()
+  .pre()
+  .post()
+  .rule('inline')
+  .after('vue')
+  .resourceQuery(/inline/)
+  .use('url')
+  .loader('url-loader')
+  .end()
+  .resolve.symlinks(true)
+  .fullySpecified(false)
+  .end()
+  .end()
+  .rules.delete('inline')
+  .end()
+  .oneOf('inline')
+  .after('vue')
+  .uses.delete('babel')
+  .end()
+  .resourceQuery(/inline/)
+  .use('url')
+  .loader('url-loader')
+  .end()
+  .end()
+  .oneOfs.delete('inline')
+  .end()
+  .resolve.symlinks(true)
+  .end()
+  .end()
+  .rules.delete('compile')
+  .end()
+  //** support https://webpack.js.org/configuration/module/#ruletype  */
+  .rule('mjs-compile')
+  .test(/\.mjs$/)
+  .type('javascript/auto')
+  .end()
+  .end()
+  // resolve
+  .resolve.alias.set('foo', 'bar')
+  .set('foo', false)
+  .set('foo', ['asd'])
   .end()
   .modules.add('index.js')
   .end()
   .aliasFields.add('foo')
+  .add(['foo'])
   .end()
   .descriptionFiles.add('foo')
+  .end()
+  .mainFiles.add('foo')
   .end()
   .extensions.add('.js')
   .end()
@@ -120,38 +178,47 @@ config
   .end()
   .mainFiles.add('index.js')
   .end()
+  .roots.add('asdasd')
+  .end()
+  .fallback.set('asd', ['asdasd'])
+  .end()
+  .byDependency.set('esm', {
+    mainFields: ['browser', 'module'],
+  })
+  .end()
+  .cachePredicate(({ path, request }) => true)
+  .cacheWithContext(true)
+  .enforceExtension(true)
+  .symlinks(true)
+  .unsafeCache(false)
+  .unsafeCache(/foo/)
+  .preferRelative(true)
+  .preferAbsolute(true)
   .plugin('foo')
   .use(ResolvePluginImpl, [])
   .end()
   .plugins.delete('foo')
   .end()
   .end()
-
+  // resolveLoader
   .resolveLoader.moduleExtensions.add('.js')
   .end()
   .packageMains.add('index.js')
   .end()
+  .modules.add('index.js')
+  .end()
+  .preferAbsolute(false)
   .plugin('foo')
   .use(webpack.DefinePlugin)
   .end()
   .end()
-
-  .performance.hints(true)
-  .hints('warning')
-  .maxEntrypointSize(20000)
-  .maxAssetSize(20000)
-  .assetFilter((filename) => true)
-  .end()
-
+  // optimization
   .optimization.concatenateModules(true)
   .flagIncludedChunks(true)
   .mergeDuplicateChunks(true)
   .minimize(true)
-  .namedChunks(true)
-  .namedModules(true)
-  .nodeEnv(true)
-  .noEmitOnErrors(true)
-  .occurrenceOrder(true)
+  .nodeEnv(false)
+  .mangleWasmImports(true)
   .portableRecords(true)
   .providedExports(true)
   .removeAvailableModules(true)
@@ -159,14 +226,17 @@ config
   .runtimeChunk('single')
   .runtimeChunk({ name: ({}) => 'hello' })
   .sideEffects(true)
-  .splitChunks({})
   .usedExports(true)
+  .splitChunks(false)
+  .splitChunks.set('chunks', 'all')
+  .set('chunks', 'all')
+  .end()
   .minimizer('foo')
   .use(webpack.DefinePlugin)
   .tap((config) => [])
   .end()
   .end()
-
+  // plugins
   .plugin('foo')
   .use(webpack.DefinePlugin, [
     {
@@ -207,12 +277,7 @@ config
   .delete('asString')
   .delete('asObject')
   .end()
-
-  .node.set('__dirname', true)
-  .delete('__dirname')
-  .clear()
-  .end()
-
+  // devServer
   .devServer.allowedHosts.add('host.com')
   .clear()
   .end()
@@ -220,10 +285,10 @@ config
   .before(() => {})
   .bonjour(true)
   .clientLogLevel('error')
-  .color(true)
   .compress(false)
   .contentBase('/')
   .contentBase(['foo', 'bar'])
+  .contentBasePublicPath('asd')
   .disableHostCheck(true)
   .filename('hello')
   .headers({
@@ -236,7 +301,8 @@ config
   .http2(true)
   .https(true)
   .index('test.html')
-  .info(true)
+  .injectClient(false)
+  .injectHot(() => false)
   .inline(true)
   .lazy(true)
   .mimeTypes({ 'text/html': ['phtml'] })
@@ -269,76 +335,73 @@ config
     errors: true,
     warnings: false,
   })
+  .transportMode('sockjs')
+  .transportMode({
+    client: {},
+    server: 'ws',
+  })
   .stdin(true)
   .useLocalIp(true)
   .watchContentBase(true)
   .watchOptions({})
   .writeToDisk(true)
   .end()
-
-  .module.noParse(/.min.js$/)
-  .strictExportPresence(true)
-  .rule('compile')
-  .test(/.js$/)
-  .include.add(/.js$/)
+  // performance
+  .performance(false)
+  .performance.hints(false)
+  .hints('warning')
+  .maxEntrypointSize(20000)
+  .maxAssetSize(20000)
+  .assetFilter((filename: string) => true)
   .end()
-  .exclude.add(/node_modules/)
+  // node
+  .node(false)
+  .node.set('__dirname', true)
+  .delete('__dirname')
+  .clear()
   .end()
-  .parser({
-    opt: 'foo',
+  // other
+  .node(false)
+  .amd({ foo: true })
+  .bail(true)
+  .cache(false)
+  .cache({
+    type: 'filesystem',
   })
-  .enforce('pre')
-  .use('babel')
-  .tap((config) => [])
-  .loader('babel-loader')
-  .options({})
-  .end()
-  .use('eslint')
-  .loader('eslint-loader')
-  .options({})
-  .after('babel')
-  .end()
-  .uses.delete('babel')
-  .delete('eslint')
-  .end()
-  .pre()
-  .post()
-  .rule('inline')
-  .after('vue')
-  .resourceQuery(/inline/)
-  .use('url')
-  .loader('url-loader')
-  .end()
-  .resolve.symlinks(true)
-  .end()
-  .end()
-  .rules.delete('inline')
-  .end()
-  .oneOf('inline')
-  .after('vue')
-  .uses.delete('babel')
-  .end()
-  .resourceQuery(/inline/)
-  .use('url')
-  .loader('url-loader')
-  .end()
-  .end()
-  .oneOfs.delete('inline')
-  .end()
-  .resolve.symlinks(true)
-  .end()
-  .end()
-  .rules.delete('compile')
-  .end()
-  .end()
-
-  //** support https://webpack.js.org/configuration/module/#ruletype  */
-  .module.rule('mjs-compile')
-  .test(/\.mjs$/)
-  .type('javascript/auto')
-  .end()
-  .end()
-
+  .devtool('hidden-source-map')
+  .devtool(false)
+  .context('')
+  .externals('foo')
+  .externals(/node_modules/)
+  .externals({ test: false, foo: 'bar' })
+  .externals(['foo', 'bar'])
+  .externals((ctx, cb: (err0: Error | undefined, result: string) => void) =>
+    cb(undefined, 'foo'),
+  )
+  .loader({})
+  .name('config-name')
+  .mode('none')
+  .mode('development')
+  .mode('production')
+  .profile(false)
+  .parallelism(2)
+  .recordsPath('')
+  .recordsInputPath('')
+  .recordsOutputPath('')
+  .stats({
+    assets: false,
+    publicPath: true,
+    modules: false,
+  })
+  .target('web')
+  .watch(true)
+  .watchOptions({})
+  .when(
+    false,
+    (config) => config.watch(true),
+    (config) => config.watch(false),
+  )
+  // end
   .merge({})
   .toConfig();
 

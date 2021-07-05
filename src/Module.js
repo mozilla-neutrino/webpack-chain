@@ -6,7 +6,20 @@ module.exports = class extends ChainedMap {
     super(parent);
     this.rules = new ChainedMap(this);
     this.defaultRules = new ChainedMap(this);
-    this.extend(['noParse', 'strictExportPresence']);
+    this.generator = new ChainedMap(this);
+    this.parser = new ChainedMap(this);
+    this.extend([
+      'noParse',
+      'unsafeCache',
+      // https://webpack.js.org/configuration/module/#module-contexts
+      // since they are document as deprecated and will soon be removed
+      // only the parameters that the demo is provided in the documentation are supported
+      'wrappedContextCritical',
+      'exprContextRegExp',
+      'wrappedContextRecursive',
+      'strictExportPresence',
+      'wrappedContextRegExp',
+    ]);
   }
 
   defaultRule(name) {
@@ -24,6 +37,8 @@ module.exports = class extends ChainedMap {
     return this.clean(
       Object.assign(this.entries() || {}, {
         defaultRules: this.defaultRules.values().map((r) => r.toConfig()),
+        generator: this.generator.entries(),
+        parser: this.parser.entries(),
         rules: this.rules.values().map((r) => r.toConfig()),
       }),
     );

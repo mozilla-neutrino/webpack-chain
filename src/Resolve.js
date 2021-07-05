@@ -11,16 +11,22 @@ module.exports = class extends ChainedMap {
     this.extensions = new ChainedSet(this);
     this.mainFields = new ChainedSet(this);
     this.mainFiles = new ChainedSet(this);
+    this.exportsFields = new ChainedSet(this);
+    this.importsFields = new ChainedSet(this);
+    this.restrictions = new ChainedSet(this);
+    this.roots = new ChainedSet(this);
     this.modules = new ChainedSet(this);
     this.plugins = new ChainedMap(this);
+    this.fallback = new ChainedMap(this);
+    this.byDependency = new ChainedMap(this);
     this.extend([
       'cachePredicate',
       'cacheWithContext',
-      'concord',
       'enforceExtension',
-      'enforceModuleExtension',
       'symlinks',
       'unsafeCache',
+      'preferRelative',
+      'preferAbsolute',
     ]);
   }
 
@@ -41,6 +47,12 @@ module.exports = class extends ChainedMap {
         mainFields: this.mainFields.values(),
         mainFiles: this.mainFiles.values(),
         modules: this.modules.values(),
+        exportsFields: this.exportsFields.values(),
+        importsFields: this.importsFields.values(),
+        restrictions: this.restrictions.values(),
+        roots: this.roots.values(),
+        fallback: this.fallback.entries(),
+        byDependency: this.byDependency.entries(),
         plugins: this.plugins.values().map((plugin) => plugin.toConfig()),
       }),
     );
@@ -54,6 +66,10 @@ module.exports = class extends ChainedMap {
       'extensions',
       'mainFields',
       'mainFiles',
+      'exportsFields',
+      'importsFields',
+      'restrictions',
+      'roots',
       'modules',
     ];
 

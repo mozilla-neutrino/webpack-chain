@@ -1,28 +1,32 @@
 const ChainedMap = require('./ChainedMap');
+const ChainedValueMap = require('./ChainedValueMap');
 const Plugin = require('./Plugin');
 
 module.exports = class extends ChainedMap {
   constructor(parent) {
     super(parent);
     this.minimizers = new ChainedMap(this);
+    this.splitChunks = new ChainedValueMap(this);
     this.extend([
-      'concatenateModules',
-      'flagIncludedChunks',
-      'mergeDuplicateChunks',
       'minimize',
-      'namedChunks',
-      'namedModules',
+      'runtimeChunk',
+      'emitOnErrors',
+      'moduleIds',
+      'chunkIds',
       'nodeEnv',
-      'noEmitOnErrors',
-      'occurrenceOrder',
-      'portableRecords',
-      'providedExports',
+      'mangleWasmImports',
       'removeAvailableModules',
       'removeEmptyChunks',
-      'runtimeChunk',
-      'sideEffects',
-      'splitChunks',
+      'mergeDuplicateChunks',
+      'flagIncludedChunks',
+      'providedExports',
       'usedExports',
+      'concatenateModules',
+      'sideEffects',
+      'portableRecords',
+      'mangleExports',
+      'innerGraph',
+      'realContentHash',
     ]);
   }
 
@@ -44,6 +48,7 @@ module.exports = class extends ChainedMap {
   toConfig() {
     return this.clean(
       Object.assign(this.entries() || {}, {
+        splitChunks: this.splitChunks.entries(),
         minimizer: this.minimizers.values().map((plugin) => plugin.toConfig()),
       }),
     );

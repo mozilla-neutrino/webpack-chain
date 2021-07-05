@@ -34,7 +34,7 @@ test('shorthand methods', () => {
   expect(config.entries()).toStrictEqual(obj);
 });
 
-test('node', () => {
+test('node is object', () => {
   const config = new Config();
   const instance = config.node
     .set('__dirname', 'mock')
@@ -45,6 +45,64 @@ test('node', () => {
   expect(config.node.entries()).toStrictEqual({
     __dirname: 'mock',
     __filename: 'mock',
+  });
+});
+
+test('node is value', () => {
+  const config = new Config();
+  const instance = config.node(false).end();
+
+  expect(instance).toBe(config);
+  expect(config.node.entries()).toStrictEqual(false);
+});
+
+test('performance is false', () => {
+  const config = new Config();
+  const instance = config.performance(false).end();
+
+  expect(instance).toBe(config);
+  expect(config.performance.entries()).toStrictEqual(false);
+});
+
+test('bail', () => {
+  const config = new Config();
+  const instance = config.bail(false);
+
+  expect(instance.toConfig()).toStrictEqual({
+    bail: false,
+  });
+});
+
+test('cache', () => {
+  const config = new Config();
+
+  const instanceBoolean = config.cache(false);
+  expect(instanceBoolean.toConfig()).toStrictEqual({
+    cache: false,
+  });
+
+  const instanceObject = config.cache({
+    allowCollectingMemory: true,
+    cacheDirectory: './',
+  });
+
+  expect(instanceBoolean.get('cache')).toStrictEqual({
+    allowCollectingMemory: true,
+    cacheDirectory: './',
+  });
+  expect(instanceObject.toConfig()).toStrictEqual({
+    cache: {
+      allowCollectingMemory: true,
+      cacheDirectory: './',
+    },
+  });
+});
+
+test('name', () => {
+  const config = new Config();
+  const instance = config.name('aaa');
+  expect(instance.toConfig()).toStrictEqual({
+    name: 'aaa',
   });
 });
 
@@ -326,9 +384,9 @@ test('merge with omit', () => {
 test('validate empty', () => {
   const config = new Config();
 
-  const errors = validate(config.toConfig());
-
-  expect(errors).toHaveLength(0);
+  expect(() => {
+    validate(config.toConfig());
+  }).not.toThrow();
 });
 
 test('validate with entry', () => {
@@ -336,9 +394,9 @@ test('validate with entry', () => {
 
   config.entry('index').add('src/index.js');
 
-  const errors = validate(config.toConfig());
-
-  expect(errors).toHaveLength(0);
+  expect(() => {
+    validate(config.toConfig());
+  }).not.toThrow();
 });
 
 test('validate with values', () => {
@@ -378,9 +436,9 @@ test('validate with values', () => {
     .loader('babel-loader')
     .options({ presets: ['alpha'] });
 
-  const errors = validate(config.toConfig());
-
-  expect(errors).toHaveLength(0);
+  expect(() => {
+    validate(config.toConfig());
+  }).not.toThrow();
 });
 
 test('toString', () => {

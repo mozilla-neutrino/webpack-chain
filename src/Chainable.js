@@ -1,14 +1,3 @@
-module.exports = class {
-  constructor(parent) {
-    this.parent = parent;
-  }
+const createChainable = require('./createClass/createChainable');
 
-  batch(handler) {
-    handler(this);
-    return this;
-  }
-
-  end() {
-    return this.parent;
-  }
-};
+module.exports = createChainable(Object);

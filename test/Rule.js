@@ -45,10 +45,15 @@ test('oneOf', () => {
 
 test('resolve', () => {
   const rule = new Rule();
-  const instance = rule.resolve.alias.set('foo', 'bar').end().end();
+  const instance = rule.resolve.alias
+    .set('foo', 'bar')
+    .end()
+    .fullySpecified(true)
+    .end();
 
   expect(instance).toBe(rule);
   expect(rule.resolve.alias.has('foo')).toBe(true);
+  expect(rule.resolve.get('fullySpecified')).toBe(true);
 });
 
 test('pre', () => {

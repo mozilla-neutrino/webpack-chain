@@ -245,6 +245,23 @@ batch(handler)
 when(condition, whenTruthy, whenFalsy)
 ```
 
+## ChainedValueMap
+
+`ChainedValueMap` inherited `ChainedMap` but callable. call it by value means to 
+set it to it and clean all data in map. set any key/value in map will clear value 
+setted by call it.
+
+It is chainable,so calling it will return the original instance, allowing you to continue to chain.
+For example, `config.node` is a `ChainedValueMap` instance, so it can be used as:
+
+```js
+// call as function will setting a value on a ChainedMap
+config.node(false);
+
+// use as `ChainedMap`
+config.node.set('amd', 'true');
+```
+
 ## ChainedSet
 
 Another of the core API interfaces in webpack-chain is a `ChainedSet`. A
@@ -361,24 +378,31 @@ Config : ChainedMap
 
 ```js
 config
+  .context(context)
+  .mode(mode)
+  .devtool(devtool)
+  .target(target)
+  .watch(watch)
+  .watchOptions(watchOptions)
+  .externals(externals)
+  .externalsType(externalsType)
+  .externalsPresets(externalsPresets)
+  .stats(stats)
+  .experiments(experiments)
   .amd(amd)
   .bail(bail)
   .cache(cache)
-  .devtool(devtool)
-  .context(context)
-  .externals(externals)
+  .dependencies(dependencies)
+  .ignoreWarnings(ignoreWarnings)
   .loader(loader)
-  .name(name)
-  .mode(mode)
   .parallelism(parallelism)
   .profile(profile)
   .recordsPath(recordsPath)
   .recordsInputPath(recordsInputPath)
   .recordsOutputPath(recordsOutputPath)
-  .stats(stats)
-  .target(target)
-  .watch(watch)
-  .watchOptions(watchOptions)
+  .name(name)
+  .infrastructureLogging(infrastructureLogging)
+  .snapshot(snapshot)
 ```
 
 #### Config entryPoints
@@ -415,32 +439,50 @@ config.output : ChainedMap
 
 config.output
   .auxiliaryComment(auxiliaryComment)
+  .charset(charset)
   .chunkFilename(chunkFilename)
   .chunkLoadTimeout(chunkLoadTimeout)
+  .chunkLoadingGlobal(chunkLoadingGlobal)
+  .chunkLoading(chunkLoading)
+  .chunkFormat(chunkFormat)
+  .enabledChunkLoadingTypes(enabledChunkLoadingTypes)
   .crossOriginLoading(crossOriginLoading)
   .devtoolFallbackModuleFilenameTemplate(devtoolFallbackModuleFilenameTemplate)
-  .devtoolLineToLine(devtoolLineToLine)
   .devtoolModuleFilenameTemplate(devtoolModuleFilenameTemplate)
   .devtoolNamespace(devtoolNamespace)
   .filename(filename)
-  .hashFunction(hashFunction)
+  .assetModuleFilename(assetModuleFilename)
+  .globalObject(globalObject)
+  .uniqueName(uniqueName)
   .hashDigest(hashDigest)
   .hashDigestLength(hashDigestLength)
+  .hashFunction(hashFunction)
   .hashSalt(hashSalt)
   .hotUpdateChunkFilename(hotUpdateChunkFilename)
   .hotUpdateFunction(hotUpdateFunction)
   .hotUpdateMainFilename(hotUpdateMainFilename)
-  .jsonpFunction(jsonpFunction)
   .library(library)
   .libraryExport(libraryExport)
   .libraryTarget(libraryTarget)
+  .importFunctionName(importFunctionName)
   .path(path)
   .pathinfo(pathinfo)
   .publicPath(publicPath)
+  .scriptType(scriptType)
   .sourceMapFilename(sourceMapFilename)
   .sourcePrefix(sourcePrefix)
+  .strictModuleErrorHandling(strictModuleErrorHandling)
   .strictModuleExceptionHandling(strictModuleExceptionHandling)
   .umdNamedDefine(umdNamedDefine)
+  .workerChunkLoading(workerChunkLoading)
+  .enabledLibraryTypes(enabledLibraryTypes)
+  .environment(environment)
+  .compareBeforeEmit(compareBeforeEmit)
+  .wasmLoading(wasmLoading)
+  .enabledWasmLoadingTypes(enabledWasmLoadingTypes)
+  .iife(iife)
+  .module(module)
+  .clean(clean)
 ```
 
 #### Config resolve: shorthand methods
@@ -452,9 +494,10 @@ config.resolve
   .cachePredicate(cachePredicate)
   .cacheWithContext(cacheWithContext)
   .enforceExtension(enforceExtension)
-  .enforceModuleExtension(enforceModuleExtension)
-  .unsafeCache(unsafeCache)
   .symlinks(symlinks)
+  .unsafeCache(unsafeCache)
+  .preferRelative(preferRelative)
+  .preferAbsolute(preferAbsolute)
 ```
 
 #### Config resolve alias
@@ -466,17 +509,6 @@ config.resolve.alias
   .set(key, value)
   .set(key, value)
   .delete(key)
-  .clear()
-```
-
-#### Config resolve modules
-
-```js
-config.resolve.modules : ChainedSet
-
-config.resolve.modules
-  .add(value)
-  .prepend(value)
   .clear()
 ```
 
@@ -534,11 +566,154 @@ config.resolve.mainFiles
   .prepend(value)
   .clear()
 ```
+#### Config resolve exportsFields
+
+```js
+config.resolve.exportsFields : ChainedSet
+
+config.resolve.exportsFields
+  .add(value)
+  .prepend(value)
+  .clear()
+```
+#### Config resolve importsFields
+
+```js
+config.resolve.importsFields : ChainedSet
+
+config.resolve.importsFields
+  .add(value)
+  .prepend(value)
+  .clear()
+```
+#### Config resolve restrictions
+
+```js
+config.resolve.restrictions : ChainedSet
+
+config.resolve.restrictions
+  .add(value)
+  .prepend(value)
+  .clear()
+```
+#### Config resolve roots
+
+```js
+config.resolve.roots : ChainedSet
+
+config.resolve.roots
+  .add(value)
+  .prepend(value)
+  .clear()
+```
+
+#### Config resolve modules
+
+```js
+config.resolve.modules : ChainedSet
+
+config.resolve.modules
+  .add(value)
+  .prepend(value)
+  .clear()
+```
+#### Config resolve plugin
+
+```js
+config.resolve
+  .plugin(name) : ChainedMap
+```
+
+#### Config resolve plugin: adding
+
+_NOTE: Do not use `new` to create the resolve plugin, as this will be done for you._
+
+```js
+config.resolve
+  .plugin(name)
+  .use(WebpackResolvePlugin, args)
+
+// Examples
+
+config.resolve
+  .plugin('resolve-css')
+  .use(ResolveCSSPlugin, [{ cssBasePath: true }])
+
+// Resolve plugins can also be specified by their path, allowing the expensive require()s to be
+// skipped in cases where the plugin or webpack configuration won't end up being used.
+config.resolve
+  .plugin('resolve-css')
+  .use(require.resolve('resolve-css-plugin'), [{ cssBasePath: true }])
+
+```
+
+#### Config resolve plugin: modify arguments
+
+```js
+config.resolve
+  .plugin(name)
+  .tap(args => newArgs)
+
+// Example
+config.resolve
+  .plugin('resolve-css')
+  .tap(args => [...args, { cssBasePath: false }])
+```
+
+#### Config resolve plugin: modify instantiation
+
+```js
+config.resolve
+  .plugin(name)
+  .init((Plugin, args) => new Plugin(...args));
+```
+
+#### Config resolve plugin: removing
+
+```js
+config.resolve.plugins.delete(name)
+```
+
+--- end
+#### Config resolve fallback
+
+```js
+config.resolve.fallback : ChainedMap
+
+config.resolve.fallback
+  .set(key, value)
+  .set(key, value)
+  .delete(key)
+  .clear()
+```
+
+#### Config resolve byDependency
+
+```js
+config.resolve.byDependency : ChainedMap
+
+config.resolve.byDependency
+  .set(key, value)
+  .set(key, value)
+  .delete(key)
+  .clear()
+```
 
 #### Config resolveLoader
 
 The API for `config.resolveLoader` is identical to `config.resolve` with
 the following additions:
+
+#### Config resolveLoader modules
+
+```js
+config.resolveLoader.modules : ChainedSet
+
+config.resolveLoader.modules
+  .add(value)
+  .prepend(value)
+  .clear()
+```
 
 #### Config resolveLoader moduleExtensions
 
@@ -565,13 +740,14 @@ config.resolveLoader.packageMains
 #### Config performance: shorthand methods
 
 ```js
-config.performance : ChainedMap
+config.performance : ChainedValueMap
 
-config.performance
+config.performance(false)
+  .performance
+  .assetFilter(assetFilter)
   .hints(hints)
   .maxEntrypointSize(maxEntrypointSize)
   .maxAssetSize(maxAssetSize)
-  .assetFilter(assetFilter)
 ```
 
 #### Configuring optimizations: shorthand methods
@@ -580,23 +756,25 @@ config.performance
 config.optimization : ChainedMap
 
 config.optimization
-  .concatenateModules(concatenateModules)
-  .flagIncludedChunks(flagIncludedChunks)
-  .mergeDuplicateChunks(mergeDuplicateChunks)
   .minimize(minimize)
-  .namedChunks(namedChunks)
-  .namedModules(namedModules)
+  .runtimeChunk(runtimeChunk)
+  .emitOnErrors(emitOnErrors)
+  .moduleIds(moduleIds)
+  .chunkIds(chunkIds)
   .nodeEnv(nodeEnv)
-  .noEmitOnErrors(noEmitOnErrors)
-  .occurrenceOrder(occurrenceOrder)
-  .portableRecords(portableRecords)
-  .providedExports(providedExports)
+  .mangleWasmImports(mangleWasmImports)
   .removeAvailableModules(removeAvailableModules)
   .removeEmptyChunks(removeEmptyChunks)
-  .runtimeChunk(runtimeChunk)
-  .sideEffects(sideEffects)
-  .splitChunks(splitChunks)
+  .mergeDuplicateChunks(mergeDuplicateChunks)
+  .flagIncludedChunks(flagIncludedChunks)
+  .providedExports(providedExports)
   .usedExports(usedExports)
+  .concatenateModules(concatenateModules)
+  .sideEffects(sideEffects)
+  .portableRecords(portableRecords)
+  .mangleExports(mangleExports)
+  .innerGraph(innerGraph)
+  .realContentHash(realContentHash)
 ```
 
 #### Config optimization minimizers
@@ -655,6 +833,20 @@ config.optimization
 
 ```js
 config.optimization.minimizers.delete(name)
+```
+#### Config optimization splitChunks
+
+```js
+config.optimization.splitChunks : ChainedValueMap
+
+config.optimization
+  .splitChunks({
+    chunks: all
+  }
+  .set(key, value)
+  .set(key, value)
+  .delete(key)
+  .clear()
 ```
 
 #### Config plugins
@@ -841,9 +1033,10 @@ config.resolve
 #### Config node
 
 ```js
-config.node : ChainedMap
+config.node : ChainedValueMap
 
-config.node
+config.node(false)
+  .node
   .set('__dirname', 'mock')
   .set('__filename', 'mock');
 ```
@@ -873,9 +1066,9 @@ config.devServer
   .before(before)
   .bonjour(bonjour)
   .clientLogLevel(clientLogLevel)
-  .color(color)
   .compress(compress)
   .contentBase(contentBase)
+  .contentBasePublicPath(contentBasePublicPath)
   .disableHostCheck(disableHostCheck)
   .filename(filename)
   .headers(headers)
@@ -886,11 +1079,14 @@ config.devServer
   .http2(http2)
   .https(https)
   .index(index)
-  .info(info)
+  .injectClient(injectClient)
+  .injectHot(injectHot)
   .inline(inline)
   .lazy(lazy)
+  .liveReload(liveReload)
   .mimeTypes(mimeTypes)
   .noInfo(noInfo)
+  .onListening(onListening)
   .open(open)
   .openPage(openPage)
   .overlay(overlay)
@@ -902,6 +1098,7 @@ config.devServer
   .public(public)
   .publicPath(publicPath)
   .quiet(quiet)
+  .serveIndex(serveIndex)
   .setup(setup)
   .socket(socket)
   .sockHost(sockHost)
@@ -910,6 +1107,7 @@ config.devServer
   .staticOptions(staticOptions)
   .stats(stats)
   .stdin(stdin)
+  .transportMode(transportMode)
   .useLocalIp(useLocalIp)
   .watchContentBase(watchContentBase)
   .watchOptions(watchOptions)
@@ -929,6 +1127,12 @@ config.module : ChainedMap
 
 config.module
   .noParse(noParse)
+  .unsafeCache(unsafeCache)
+  .wrappedContextCritical(wrappedContextCritical)
+  .exprContextRegExp(exprContextRegExp)
+  .wrappedContextRecursive(wrappedContextRecursive)
+  .strictExportPresence(strictExportPresence)
+  .wrappedContextRegExp(wrappedContextRegExp)
 ```
 
 #### Config module rules: shorthand methods
